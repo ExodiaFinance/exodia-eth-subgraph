@@ -1,0 +1,1 @@
+## Exodia subgraph for our treasury on Ethereum
