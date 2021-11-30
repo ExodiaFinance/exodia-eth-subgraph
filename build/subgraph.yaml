@@ -1,6 +1,6 @@
 specVersion: 0.0.2
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: sOlympus
@@ -18,9 +18,9 @@ dataSources:
         - OHMDAILP
       abis:
         - name: sOlympus
-          file: ./abis/sOlympus.json
+          file: sOlympus/abis/sOlympus.json
         - name: OHMDAILP
-          file: ./abis/OHMDAILP.json
+          file: sOlympus/abis/OHMDAILP.json
       blockHandlers:
         - handler: handleBlock
-      file: ./src/mapping.ts
+      file: sOlympus/sOlympus.wasm

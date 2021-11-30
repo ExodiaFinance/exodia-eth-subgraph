@@ -1,93 +1,58 @@
-import { BigInt } from "@graphprotocol/graph-ts"
+import { Address, BigInt, ethereum, BigDecimal, log } from "@graphprotocol/graph-ts"
 import {
   sOlympus,
-  Approval,
-  LogRebase,
-  LogStakingContractUpdated,
-  LogSupply,
-  OwnershipPulled,
-  OwnershipPushed,
-  Transfer
 } from "../generated/sOlympus/sOlympus"
-import { ExampleEntity } from "../generated/schema"
+import { OHMDAILP } from "../generated/sOlympus/OHMDAILP";
+import { Balance } from "../generated/schema"
 
-export function handleApproval(event: Approval): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
-
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (!entity) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
-
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
-  }
-
-  // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
-
-  // Entity fields can be set based on event parameters
-  entity.owner = event.params.owner
-  entity.spender = event.params.spender
-
-  // Entities can be written to the store with `.save()`
-  entity.save()
-
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
-
-  // It is also possible to access smart contracts from mappings. For
-  // example, the contract that has emitted the event can be connected to
-  // with:
-  //
-  // let contract = Contract.bind(event.address)
-  //
-  // The following functions can then be called on this contract to access
-  // state variables and other data:
-  //
-  // - contract.DOMAIN_SEPARATOR(...)
-  // - contract.INDEX(...)
-  // - contract.PERMIT_TYPEHASH(...)
-  // - contract.allowance(...)
-  // - contract.approve(...)
-  // - contract.balanceForGons(...)
-  // - contract.balanceOf(...)
-  // - contract.circulatingSupply(...)
-  // - contract.decimals(...)
-  // - contract.decreaseAllowance(...)
-  // - contract.gonsForBalance(...)
-  // - contract.increaseAllowance(...)
-  // - contract.index(...)
-  // - contract.initialize(...)
-  // - contract.initializer(...)
-  // - contract.manager(...)
-  // - contract.name(...)
-  // - contract.nonces(...)
-  // - contract.rebase(...)
-  // - contract.rebases(...)
-  // - contract.setIndex(...)
-  // - contract.stakingContract(...)
-  // - contract.symbol(...)
-  // - contract.totalSupply(...)
-  // - contract.transfer(...)
-  // - contract.transferFrom(...)
+function dayFromTimestamp(timestamp: BigInt): string {
+  let day_ts = timestamp.toI32() - (timestamp.toI32() % 86400)
+  return day_ts.toString()
 }
 
-export function handleLogRebase(event: LogRebase): void {}
+function getOHMUSDRate(): BigDecimal {
+  let pair = OHMDAILP.bind(Address.fromString("0x34d7d7Aaf50AD4944B70B320aCB24C95fa2def7c"))
 
-export function handleLogStakingContractUpdated(
-  event: LogStakingContractUpdated
-): void {}
+  let reserves = pair.getReserves()
+  let reserve0 = reserves.value0.toBigDecimal()
+  let reserve1 = reserves.value1.toBigDecimal()
 
-export function handleLogSupply(event: LogSupply): void {}
+  let ohmRate = reserve1.div(reserve0).div(BigDecimal.fromString('1e9'))
+  log.debug("OHM rate {}", [ohmRate.toString()])
 
-export function handleOwnershipPulled(event: OwnershipPulled): void {}
+  return ohmRate
+}
 
-export function handleOwnershipPushed(event: OwnershipPushed): void {}
+function toDecimal(
+  value: BigInt,
+  decimals: number = 9,
+): BigDecimal {
+  let precision = BigInt.fromI32(10)
+    .pow(<u8>decimals)
+    .toBigDecimal();
 
-export function handleTransfer(event: Transfer): void {}
+  return value.divDecimal(precision);
+}
+
+export function handleBlock(block: ethereum.Block): void {
+  let dayTimestamp = dayFromTimestamp(block.timestamp);
+  let balance = Balance.load(dayTimestamp);
+  if (!balance) {
+    balance = new Balance(dayTimestamp);
+    let contract = sOlympus.bind(Address.fromString("0x04F2694C8fcee23e8Fd0dfEA1d4f5Bb8c352111F"));
+    const sOHMBalanceCall = contract.try_balanceOf(Address.fromString("0xdAdB69F5061E9087f8C30594bC2567D8Bc927C2b"));
+    if (!sOHMBalanceCall.reverted) {
+      const sOHMBalance = toDecimal(sOHMBalanceCall.value);
+      balance.sOHMBalance = sOHMBalance;
+      let OHMPrice = getOHMUSDRate();
+      balance.sOHMBalanceUSD = sOHMBalance.times(OHMPrice);
+    } else {
+      balance.sOHMBalance = BigDecimal.fromString("0");
+      balance.sOHMBalanceUSD = BigDecimal.fromString("0");
+    }
+    balance.timestamp = block.timestamp;
+    balance.save();
+  }
+  balance.save();
+};
+
