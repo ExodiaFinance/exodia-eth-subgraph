@@ -1,0 +1,6 @@
+type Balance @entity {
+  id: ID!
+  sOHMBalance: BigDecimal!
+  timestamp: BigInt!
+  sOHMBalanceUSD: BigDecimal!
+}

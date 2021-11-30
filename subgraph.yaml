@@ -1,0 +1,26 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: sOlympus
+    network: mainnet
+    source:
+      address: "0x04f2694c8fcee23e8fd0dfea1d4f5bb8c352111f"
+      abi: sOlympus
+      startBlock: 13546657
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - sOlympus
+        - OHMDAILP
+      abis:
+        - name: sOlympus
+          file: ./abis/sOlympus.json
+        - name: OHMDAILP
+          file: ./abis/OHMDAILP.json
+      blockHandlers:
+        - handler: handleBlock
+      file: ./src/mapping.ts
