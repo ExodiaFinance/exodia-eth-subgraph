@@ -7,8 +7,8 @@ export function dayFromTimestamp(timestamp: BigInt): string {
     return day_ts.toString()
   }
   
-  export function hourFromTimestamp(timestamp: BigInt): string {
-    let day_ts = timestamp.toI32() - (timestamp.toI32() % 3600)
+  export function fiveMinutesFromTimestamp(timestamp: BigInt): string {
+    let day_ts = timestamp.toI32() - (timestamp.toI32() % 300)
     return day_ts.toString()
   }
   
