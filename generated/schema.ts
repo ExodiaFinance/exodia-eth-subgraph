@@ -18,7 +18,11 @@ export class Balance extends Entity {
 
     this.set("sOHMBalance", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("hourTimestamp", Value.fromBigInt(BigInt.zero()));
     this.set("sOHMBalanceUSD", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("index", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("ohmPrice", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("gOhmPrice", Value.fromBigDecimal(BigDecimal.zero()));
   }
 
   save(): void {
@@ -65,6 +69,15 @@ export class Balance extends Entity {
     this.set("timestamp", Value.fromBigInt(value));
   }
 
+  get hourTimestamp(): BigInt {
+    let value = this.get("hourTimestamp");
+    return value!.toBigInt();
+  }
+
+  set hourTimestamp(value: BigInt) {
+    this.set("hourTimestamp", Value.fromBigInt(value));
+  }
+
   get sOHMBalanceUSD(): BigDecimal {
     let value = this.get("sOHMBalanceUSD");
     return value!.toBigDecimal();
@@ -72,5 +85,32 @@ export class Balance extends Entity {
 
   set sOHMBalanceUSD(value: BigDecimal) {
     this.set("sOHMBalanceUSD", Value.fromBigDecimal(value));
+  }
+
+  get index(): BigDecimal {
+    let value = this.get("index");
+    return value!.toBigDecimal();
+  }
+
+  set index(value: BigDecimal) {
+    this.set("index", Value.fromBigDecimal(value));
+  }
+
+  get ohmPrice(): BigDecimal {
+    let value = this.get("ohmPrice");
+    return value!.toBigDecimal();
+  }
+
+  set ohmPrice(value: BigDecimal) {
+    this.set("ohmPrice", Value.fromBigDecimal(value));
+  }
+
+  get gOhmPrice(): BigDecimal {
+    let value = this.get("gOhmPrice");
+    return value!.toBigDecimal();
+  }
+
+  set gOhmPrice(value: BigDecimal) {
+    this.set("gOhmPrice", Value.fromBigDecimal(value));
   }
 }
