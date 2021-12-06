@@ -1,6 +1,9 @@
 specVersion: 0.0.2
 schema:
   file: ./schema.graphql
+graft:
+  base: QmcLirYbV6A6GnS2CdCpoZsQB2baGZUKGvG8TPStZcjrZz
+  block: 13747188
 dataSources:
   - kind: ethereum/contract
     name: sOlympus

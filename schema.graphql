@@ -3,4 +3,7 @@ type Balance @entity {
   sOHMBalance: BigDecimal!
   timestamp: BigInt!
   sOHMBalanceUSD: BigDecimal!
+  index: BigDecimal
+  ohmPrice: BigDecimal
+  gOhmPrice: BigDecimal
 }
