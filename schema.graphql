@@ -2,9 +2,8 @@ type Balance @entity {
   id: ID!
   sOHMBalance: BigDecimal!
   timestamp: BigInt!
-  hourTimestamp: BigInt!
   sOHMBalanceUSD: BigDecimal!
-  index: BigDecimal!
-  ohmPrice: BigDecimal!
-  gOhmPrice: BigDecimal!
+  index: BigDecimal
+  ohmPrice: BigDecimal
+  gOhmPrice: BigDecimal
 }
